@@ -1,0 +1,297 @@
+{
+	"info": {
+		"_postman_id": "13d82fd7-049b-4c4b-a0fc-9727d51e6606",
+		"name": "Referral-System-HS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45193307",
+		"_collection_link": "https://anton-923743.postman.co/workspace/Anton's-Workspace~0746cc6f-10a9-44dc-8a92-faad733847e0/collection/45193307-13d82fd7-049b-4c4b-a0fc-9727d51e6606?action=share&source=collection_link&creator=45193307"
+	},
+	"item": [
+		{
+			"name": "Login: send_code",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"phone\": \"+37529777777722222222222\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/login/send_code/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"login",
+						"send_code",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login: verify_code",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"phone\": \"+375297777777\",\n  \"code\": \"4430\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/login/verify_code/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"login",
+						"verify_code",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test authorization",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNDY3OTYyLCJpYXQiOjE3NTM0Njc2NjIsImp0aSI6IjM3NGQyYTZmMGQ4YjRkMDRhNmQzYTY5ZTg5YTA3Yjc0IiwidXNlcl9pZCI6IjQifQ.t1HnN4FfYXTsXG7dYBDKfmQnijPYUmVsNCeiC9kgZMo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/get_profile/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"get_profile",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test refresh token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n      \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MzUyMzk2MywiaWF0IjoxNzUzNDM3NTYzLCJqdGkiOiJiMTg1OWJjZGM4YjI0NTFiOGQ0ZDk5NWVkMDlmOTdkZSIsInVzZXJfaWQiOiIyIn0.x8Bg-FwpMl5i39kPGLR536ZW7F_-G3ygKOjkxFHE5N8\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/token/refresh/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"token",
+						"refresh",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get profile",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNDY5MDMxLCJpYXQiOjE3NTM0Njg3MzEsImp0aSI6IjFiZDExZTdjOGI2ZTRjMDRiMGNhODFiNDM2NDZmMGNhIiwidXNlcl9pZCI6IjIifQ.j4Twwk8QewRuqp7ZLMBdtv0lSt9i0tTvgiw0WciHyCY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/get_profile/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"get_profile",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Use invite code",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNDY3OTYyLCJpYXQiOjE3NTM0Njc2NjIsImp0aSI6IjM3NGQyYTZmMGQ4YjRkMDRhNmQzYTY5ZTg5YTA3Yjc0IiwidXNlcl9pZCI6IjQifQ.t1HnN4FfYXTsXG7dYBDKfmQnijPYUmVsNCeiC9kgZMo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"invite_code\": \"5BB771\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/use_invite_code/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"use_invite_code",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "AccessToken1",
+			"value": "---",
+			"type": "string"
+		},
+		{
+			"key": "AccessToken2",
+			"value": "---",
+			"type": "string"
+		},
+		{
+			"key": "AccessToken3",
+			"value": "---",
+			"type": "string"
+		},
+		{
+			"key": "AccessToken4",
+			"value": "---",
+			"type": "string"
+		},
+		{
+			"key": "AccessToken5",
+			"value": "---",
+			"type": "string"
+		},
+		{
+			"key": "AccessToken6",
+			"value": "---",
+			"type": "string"
+		}
+	]
+}
