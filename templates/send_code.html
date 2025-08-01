@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login by Phone</title>
+  <link rel="stylesheet" href="{% static 'css/send_code.css' %}">
+</head>
+<body>
+
+  <div class="container">
+    <h2>Phone Login</h2>
+    <input type="text" id="phone" placeholder="Enter your phone number" />
+    <button onclick="sendCode()">Send Code</button>
+    <div id="status" class="status"></div>
+
+  </div>
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000/login';
+  </script>
+  <script src="{% static 'js/send_code.js' %}" defer></script>
+
+</body>
+</html>

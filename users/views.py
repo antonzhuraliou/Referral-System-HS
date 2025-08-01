@@ -5,6 +5,7 @@ from typing import Optional
 
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
+from django.template.response import TemplateResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -33,6 +34,10 @@ class SendCodeView(APIView):
     """
     Send a 4-digit verification code to a Belarusian phone number.
     """
+
+    def get(self, request):
+        return TemplateResponse(request, 'send_code.html')
+
 
     @extend_schema(
         tags=["Auth"],
