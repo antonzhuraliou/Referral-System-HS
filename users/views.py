@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-
+from users.utils import set_code_redis, check_rate_limit, create_phone_key
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 
 from .serializers import (
@@ -23,10 +23,9 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
-OTP_PREFIX = "OTP:"
-OTP_TIMEOUT = 120
 BELARUS_PHONE_REGEX = r'^\+375(25|29|33|44)\d{7}$'
 
 
@@ -76,18 +75,12 @@ class SendCodeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        key = f"{OTP_PREFIX}{phone}"
+        key = f"{phone}"
 
-        if cache.get(key):
-            return Response(
-                {'error': 'Please wait before requesting another code.'},
-                status=status.HTTP_429_TOO_MANY_REQUESTS
-            )
 
-        code = f'{randint(1000, 9999)}'
-        cache.set(key, code, timeout=OTP_TIMEOUT)
+        check_rate_limit(key)
 
-        logger.info(f"Verification code {code} sent to {phone}")
+        set_code_redis(request)
 
         return Response({'message': 'Verification code has been sent successfully'}, status=status.HTTP_200_OK)
 
@@ -133,7 +126,7 @@ class VerifyCodeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        key = f"{OTP_PREFIX}{phone}"
+        key = f"{phone}"
         cached_code = cache.get(key)
 
         if cached_code is None:
