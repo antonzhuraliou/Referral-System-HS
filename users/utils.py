@@ -1,6 +1,16 @@
 from string import ascii_uppercase, digits
 from random import choices
 from .models import InviteCode
+from random import randint
+from django.core.cache import cache
+import logging
+from rest_framework.response import Response
+from rest_framework import status
+
+
+logger = logging.getLogger(__name__)
+
+OTP_TIMEOUT = 120
 
 def generate_invite_code():
     """
@@ -22,3 +32,30 @@ def generate_unique_invite_code():
             return invite_code
     else:
         raise Exception("Could not generate a unique invite code")
+
+
+def create_phone_key(request):
+    phone = request.data.get('phone')
+    return phone
+
+
+def set_code_redis(request):
+
+    key = create_phone_key(request)
+
+    code = f'{randint(1000, 9999)}'
+    cache.set(key, code, timeout=OTP_TIMEOUT)
+
+    logger.info(f"Verification code {code} sent to {key}")
+
+    return Response(status=status.HTTP_201_CREATED)
+
+
+def check_rate_limit(key):
+    if cache.get(key):
+        return Response(
+                {'error': 'Please wait before requesting another code.'},
+                status=status.HTTP_429_TOO_MANY_REQUESTS
+            )
+
+
