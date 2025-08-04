@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Verify Code</title>
+    <link rel="stylesheet" href="{% static 'css/verify_code.css' %}">
+</head>
+<body>
+
+    <div class="container">
+        <h2>Verify Code</h2>
+        <input type="text" id="code" placeholder="Enter your code" />
+        <button class="verify" onclick="verifyCode()">Verify</button>
+        <button class="resend" onclick="resendCode()">Resend Code</button>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="{% static 'js/verify_code.js' %}" defer></script>
+
+</body>
+</html>
