@@ -153,6 +153,22 @@ class VerifyCodeView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+class ResendCodeView(APIView):
+
+    def post(self, request):
+
+        key = create_phone_key(request)
+
+        error_response = check_rate_limit(key)
+
+        if error_response:
+            return error_response
+
+        set_code_redis(request)
+
+        return Response(status=status.HTTP_201_CREATED)
+
+
 class GetProfileView(APIView):
     """
     Retrieve authenticated user's profile.
