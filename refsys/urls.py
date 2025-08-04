@@ -27,12 +27,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/send_code/', views.SendCodeView.as_view()),
-    path('login/verify_code/', views.VerifyCodeView.as_view()),
+    path('auth/send_code/', views.SendCodeView.as_view()),
+    path('auth/verify_code/', views.VerifyCodeView.as_view()),
     path('verify_page/', TemplateView.as_view(template_name='verify_code.html')),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('get_profile/', views.GetProfileView.as_view()),
-    path('use_invite_code/', views.UseInviteView.as_view()),
+    path('profile/', views.GetProfileView.as_view()),
+    path('invite-code/use/', views.UseInviteView.as_view()),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
