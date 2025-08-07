@@ -23,6 +23,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='invitecode',
             name='owner',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='own_invite_code', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='own_invite_code',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import MyUser, InviteCode
+
+from .models import InviteCode, MyUser
 
 
 class SendCodeRequestSerializer(serializers.Serializer):
@@ -37,6 +38,7 @@ class UserShortSerializer(serializers.ModelSerializer):
 
 class UserInviteCodeSerializer(serializers.ModelSerializer):
     invite_code = serializers.CharField(source='own_invite_code.invite_code')
+
     class Meta:
         model = MyUser
         fields = ['invite_code']
@@ -45,11 +47,10 @@ class UserInviteCodeSerializer(serializers.ModelSerializer):
 class MyUserSerializer(serializers.ModelSerializer):
     referrals = UserShortSerializer(many=True)
     invited_by = UserInviteCodeSerializer()
-    own_invite_code = serializers.CharField(source='own_invite_code.invite_code')
+    own_invite_code = serializers.CharField(
+        source='own_invite_code.invite_code'
+    )
 
     class Meta:
         model = MyUser
         fields = ['id', 'phone', 'own_invite_code', 'invited_by', 'referrals']
-
-
-

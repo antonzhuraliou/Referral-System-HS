@@ -1,16 +1,17 @@
-from string import ascii_uppercase, digits
-from random import choices
-from .models import InviteCode
-from random import randint
-from django.core.cache import cache
 import logging
-from rest_framework.response import Response
-from rest_framework import status
+from random import choices, randint
+from string import ascii_uppercase, digits
 
+from django.core.cache import cache
+from rest_framework import status
+from rest_framework.response import Response
+
+from .models import InviteCode
 
 logger = logging.getLogger(__name__)
 
 OTP_TIMEOUT = 120
+
 
 def generate_invite_code():
     """
@@ -54,8 +55,6 @@ def set_code_redis(request):
 def check_rate_limit(key):
     if cache.get(key):
         return Response(
-                {'error': 'Please wait before requesting another code.'},
-                status=status.HTTP_429_TOO_MANY_REQUESTS
-            )
-
-
+            {'error': 'Please wait before requesting another code.'},
+            status=status.HTTP_429_TOO_MANY_REQUESTS,
+        )

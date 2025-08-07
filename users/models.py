@@ -1,6 +1,9 @@
-from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
-from django.db import transaction
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
+from django.db import models, transaction
 
 
 class MyUserManager(BaseUserManager):
@@ -15,6 +18,7 @@ class MyUserManager(BaseUserManager):
 
         with transaction.atomic():
             from users.utils import generate_unique_invite_code
+
             invite_code = generate_unique_invite_code()
 
             user = self.model(phone=phone, **extra_fields)
@@ -24,7 +28,6 @@ class MyUserManager(BaseUserManager):
             InviteCode.objects.create(invite_code=invite_code, owner=user)
 
             return user
-
 
     def create_superuser(self, phone, **extra_fields):
         """
@@ -37,15 +40,20 @@ class MyUserManager(BaseUserManager):
         return self.create_user(phone, **extra_fields)
 
 
-
 class MyUser(AbstractBaseUser, PermissionsMixin):
     """
     Custom user model that uses phone number as the unique identifier.
     Each user has a unique invite code and may be invited by another user.
     """
 
-    phone = models.CharField(max_length=15,unique=True,db_index=True)
-    invited_by = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='referrals')
+    phone = models.CharField(max_length=15, unique=True, db_index=True)
+    invited_by = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='referrals',
+    )
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -65,7 +73,12 @@ class InviteCode(models.Model):
     """
 
     invite_code = models.CharField(max_length=6, unique=True)
-    owner = models.OneToOneField('MyUser', on_delete=models.CASCADE, related_name='own_invite_code', null=True)
+    owner = models.OneToOneField(
+        'MyUser',
+        on_delete=models.CASCADE,
+        related_name='own_invite_code',
+        null=True,
+    )
 
     def __str__(self):
         return self.invite_code

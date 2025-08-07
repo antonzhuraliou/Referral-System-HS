@@ -9,10 +9,13 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+
+import logging
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
-import logging
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
@@ -39,7 +42,6 @@ INSTALLED_APPS = [
     'users',
     'rest_framework',
     'drf_spectacular',
-
 ]
 
 MIDDLEWARE = [
@@ -82,7 +84,7 @@ DATABASES = {
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('PASSWORD'),
         'HOST': os.getenv('HOST'),
-        'PORT': os.getenv('PORT')
+        'PORT': os.getenv('PORT'),
     }
 }
 
@@ -136,7 +138,7 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+        },
     }
 }
 
@@ -159,7 +161,7 @@ SPECTACULAR_SETTINGS = {
     },
     'REDOC_UI_SETTINGS': {
         'expandResponses': '200,201',
-    }
+    },
 }
 
 

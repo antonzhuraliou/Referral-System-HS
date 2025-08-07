@@ -1,25 +1,29 @@
-import re
 import logging
-from random import randint
+import re
 from typing import Optional
 
-from django.core.cache import cache
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.template.response import TemplateResponse
-from rest_framework.views import APIView
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiResponse,
+    extend_schema,
+)
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import status
-from users.utils import set_code_redis, check_rate_limit, create_phone_key
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
+
+from users.utils import check_rate_limit, create_phone_key, set_code_redis
 
 from .serializers import (
+    MyUserSerializer,
     SendCodeRequestSerializer,
-    VerifyCodeRequestSerializer,
     TokenResponseSerializer,
     UseInviteCodeRequestSerializer,
-    MyUserSerializer,
+    VerifyCodeRequestSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -37,52 +41,55 @@ class SendCodeView(APIView):
     def get(self, request):
         return TemplateResponse(request, 'send_code.html')
 
-
     @extend_schema(
         tags=["Auth"],
         request=SendCodeRequestSerializer,
         responses={
             200: OpenApiResponse(
-                response=None,
-                description="Code successfully sent."
+                response=None, description="Code successfully sent."
             ),
             400: OpenApiResponse(
-                response=None,
-                description="Missing or invalid phone number."
+                response=None, description="Missing or invalid phone number."
             ),
             429: OpenApiResponse(
-                response=None,
-                description="Too many requests."
-            )
+                response=None, description="Too many requests."
+            ),
         },
         examples=[
             OpenApiExample(
                 name="Send code request",
                 value={"phone": "+375291234567"},
-                request_only=True
+                request_only=True,
             )
-        ]
+        ],
     )
     def post(self, request) -> Response:
         phone: Optional[str] = request.data.get('phone')
 
         if not phone:
-            return Response({'error': 'Please provide your phone number.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Please provide your phone number.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if not re.match(BELARUS_PHONE_REGEX, phone):
             return Response(
-                {'error': 'Only Belarusian phone numbers are allowed. Format: +375XXXXXXXXX'},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    'error': 'Only Belarusian phone numbers are allowed. Format: +375XXXXXXXXX'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         key = f"{phone}"
-
 
         check_rate_limit(key)
 
         set_code_redis(request)
 
-        return Response({'message': 'Verification code has been sent successfully'}, status=status.HTTP_200_OK)
+        return Response(
+            {'message': 'Verification code has been sent successfully'},
+            status=status.HTTP_200_OK,
+        )
 
 
 class VerifyCodeView(APIView):
@@ -96,25 +103,25 @@ class VerifyCodeView(APIView):
         responses={
             200: OpenApiResponse(
                 response=TokenResponseSerializer,
-                description="Code verified. Tokens issued."
+                description="Code verified. Tokens issued.",
             ),
             400: OpenApiResponse(
                 response=None,
-                description="Missing/invalid data or code expired."
-            )
+                description="Missing/invalid data or code expired.",
+            ),
         },
         examples=[
             OpenApiExample(
                 name="Verify code request",
                 value={"phone": "+375291234567", "code": "1234"},
-                request_only=True
+                request_only=True,
             ),
             OpenApiExample(
                 name="Verify code response",
                 value={"refresh": "xxx", "access": "yyy", "user_id": 1},
-                response_only=True
-            )
-        ]
+                response_only=True,
+            ),
+        ],
     )
     def post(self, request) -> Response:
         phone: Optional[str] = request.data.get('phone')
@@ -122,19 +129,28 @@ class VerifyCodeView(APIView):
 
         if not phone or not code:
             return Response(
-                {'error': 'Please provide your phone number and the verification code.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    'error': 'Please provide your phone number and the verification code.'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         key = f"{phone}"
         cached_code = cache.get(key)
 
         if cached_code is None:
-            return Response({'error': 'The verification code has expired or was not requested.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    'error': 'The verification code has expired or was not requested.'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if str(cached_code) != str(code):
-            return Response({'error': 'Incorrect code. Please try again.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Incorrect code. Please try again.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         cache.delete(key)
 
@@ -144,13 +160,18 @@ class VerifyCodeView(APIView):
 
         refresh = RefreshToken.for_user(user)
 
-        logger.info(f"User {user.id} authenticated successfully via phone {phone}")
+        logger.info(
+            f"User {user.id} authenticated successfully via phone {phone}"
+        )
 
-        return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-            'user_id': user.id
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user_id': user.id,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ResendCodeView(APIView):
@@ -173,27 +194,30 @@ class GetProfileView(APIView):
     """
     Retrieve authenticated user's profile.
     """
+
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["User"],
         responses={
             200: OpenApiResponse(
-                response=MyUserSerializer,
-                description="User profile"
+                response=MyUserSerializer, description="User profile"
             )
-        }
+        },
     )
     def get(self, request) -> Response:
         user = User.objects.get(id=request.user.id)
         serializer = MyUserSerializer(user)
-        return Response({'profile': serializer.data}, status=status.HTTP_200_OK)
+        return Response(
+            {'profile': serializer.data}, status=status.HTTP_200_OK
+        )
 
 
 class UseInviteView(APIView):
     """
     Apply another user's invite code. Can be done only once.
     """
+
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -201,25 +225,23 @@ class UseInviteView(APIView):
         request=UseInviteCodeRequestSerializer,
         responses={
             200: OpenApiResponse(
-                response=None,
-                description="Invite code successfully applied."
+                response=None, description="Invite code successfully applied."
             ),
             400: OpenApiResponse(
                 response=None,
-                description="Invalid input or code already used."
+                description="Invalid input or code already used.",
             ),
             404: OpenApiResponse(
-                response=None,
-                description="Invite code not found."
-            )
+                response=None, description="Invite code not found."
+            ),
         },
         examples=[
             OpenApiExample(
                 name="Apply invite code",
                 value={"invite_code": "ABC123"},
-                request_only=True
+                request_only=True,
             )
-        ]
+        ],
     )
     def post(self, request) -> Response:
         user = request.user
@@ -228,35 +250,43 @@ class UseInviteView(APIView):
         if not invite_code:
             return Response(
                 {"error": "Please enter an invite code."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if user.invited_by is not None:
             return Response(
-                {"error": "You have already used an invite code. It can only be entered once."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error": "You have already used an invite code. It can only be entered once."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
-            user_invited_by = User.objects.get(own_invite_code__invite_code=invite_code)
+            user_invited_by = User.objects.get(
+                own_invite_code__invite_code=invite_code
+            )
         except User.DoesNotExist:
             return Response(
-                {"error": "Invite code not found. Please check the code and try again."},
-                status=status.HTTP_404_NOT_FOUND
+                {
+                    "error": "Invite code not found. Please check the code and try again."
+                },
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         if user.id == user_invited_by.id:
             return Response(
                 {"error": "You cannot use your own invite code."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         user.invited_by = user_invited_by
         user.save()
 
-        logger.info(f"User {user.id} used invite code from user {user_invited_by.id}")
+        logger.info(
+            f"User {user.id} used invite code from user {user_invited_by.id}"
+        )
 
         return Response(
             {"message": "Invite code applied successfully. Welcome!"},
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )

@@ -1,0 +1,28 @@
+[tool.black]
+line-length = 79
+target-version = ['py312']
+skip-string-normalization = true
+
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+exclude = [
+    ".git",
+    "__pycache__",
+    "migrations",
+    "venv",
+    ".venv",
+    "manage.py"
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+skip-magic-trailing-comma = false
+line-ending = "lf"
+
+[tool.mypy]
+python_version = 3.12
+ignore_missing_imports = true
