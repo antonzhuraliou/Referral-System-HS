@@ -37,7 +37,8 @@ async function verifyCode() {
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
             showMessage('Code verified! You are logged in.', 'success');
-        } else {
+            setTimeout(() => {window.location.href = '/profile-page/'}, 500);
+            } else {
             showMessage(data.detail || 'Invalid code. Try again.', 'error');
         }
     } catch (err) {

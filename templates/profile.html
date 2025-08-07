@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h1>User Profile</h1>
+
+    <section class="profile-section">
+      <h2>Phone</h2>
+      <div class="field">
+        <div id="phone" class="value">Loading...</div>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <h2>Your Invite Code</h2>
+      <div class="field">
+        <div id="ownInviteCode" class="value">Loading...</div>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <h2>Invited By</h2>
+      <div class="field">
+        <div id="invitedBy" class="value">Loading...</div>
+
+        <div id="inviteForm" style="display: none; margin-top: 12px;">
+          <input type="text" id="inviteInput" placeholder="Enter invite code" style="padding: 10px; width: 60%; border: 1px solid #ccc; border-radius: 6px;" />
+          <button onclick="submitInviteCode()" style="padding: 10px 15px; background-color: #69c7a3; color: white; border: none; border-radius: 6px; margin-left: 10px;">Apply</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <h2>Referrals</h2>
+      <ul id="referralsList">
+        <li>Loading...</li>
+      </ul>
+    </section>
+
+    <div id="message" class="message"></div>
+
+    <div class="actions">
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script src="{% static 'js/profile.js' %}" defer></script>
+
+</body>
+</html>

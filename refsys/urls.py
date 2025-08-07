@@ -34,6 +34,7 @@ urlpatterns = [
     path('verify_page/', TemplateView.as_view(template_name='verify_code.html')),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', views.GetProfileView.as_view(), name='profile'),
+    path('profile-page/', TemplateView.as_view(template_name='profile.html'), name='profile-page'),
     path('invite-code/use/', views.UseInviteView.as_view()),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
