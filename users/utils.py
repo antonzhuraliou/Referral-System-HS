@@ -36,12 +36,19 @@ def generate_unique_invite_code():
 
 
 def create_phone_key(request):
+    """
+    Extracts the phone number from the incoming request data to be used as a unique key in Redis/cache operations.
+    """
     phone = request.data.get('phone')
     return phone
 
 
 def set_code_redis(request):
+    """
+    Generates a random 4-digit verification code and stores it in the cache with a timeout.
 
+    Also logs the generated code and associated phone number for debugging/audit purposes.
+    """
     key = create_phone_key(request)
 
     code = f'{randint(1000, 9999)}'
@@ -53,6 +60,9 @@ def set_code_redis(request):
 
 
 def check_rate_limit(key):
+    """
+    Checks if a verification code has already been sent recently for the given phone number.
+    """
     if cache.get(key):
         return Response(
             {'error': 'Please wait before requesting another code.'},

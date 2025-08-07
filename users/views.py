@@ -38,6 +38,15 @@ class SendCodeView(APIView):
     Send a 4-digit verification code to a Belarusian phone number.
     """
 
+    @extend_schema(
+        tags=["Auth"],
+        responses={
+            200: OpenApiResponse(
+                response=None,
+                description="Returns the HTML page for sending the code."
+            ),
+        },
+    )
     def get(self, request):
         return TemplateResponse(request, 'send_code.html')
 
@@ -101,10 +110,7 @@ class VerifyCodeView(APIView):
         tags=["Auth"],
         request=VerifyCodeRequestSerializer,
         responses={
-            200: OpenApiResponse(
-                response=TokenResponseSerializer,
-                description="Code verified. Tokens issued.",
-            ),
+            200: TokenResponseSerializer,
             400: OpenApiResponse(
                 response=None,
                 description="Missing/invalid data or code expired.",
@@ -175,7 +181,31 @@ class VerifyCodeView(APIView):
 
 
 class ResendCodeView(APIView):
+    """
+    Resend a 4-digit verification code to a Belarusian phone number.
+    """
 
+    @extend_schema(
+        tags=["Auth"],
+        request=SendCodeRequestSerializer,
+        responses={
+            201: OpenApiResponse(
+                response=None,
+                description="Verification code resent successfully."
+            ),
+            429: OpenApiResponse(
+                response=None,
+                description="Too many requests."
+            ),
+        },
+        examples=[
+            OpenApiExample(
+                name="Resend code request",
+                value={"phone": "+375291234567"},
+                request_only=True,
+            )
+        ],
+    )
     def post(self, request):
 
         key = create_phone_key(request)
@@ -200,9 +230,11 @@ class GetProfileView(APIView):
     @extend_schema(
         tags=["User"],
         responses={
-            200: OpenApiResponse(
-                response=MyUserSerializer, description="User profile"
-            )
+            200: MyUserSerializer,
+            401: OpenApiResponse(
+                response=None,
+                description="Authentication credentials were not provided or invalid."
+            ),
         },
     )
     def get(self, request) -> Response:
@@ -225,14 +257,20 @@ class UseInviteView(APIView):
         request=UseInviteCodeRequestSerializer,
         responses={
             200: OpenApiResponse(
-                response=None, description="Invite code successfully applied."
+                response=None,
+                description="Invite code successfully applied."
             ),
             400: OpenApiResponse(
                 response=None,
-                description="Invalid input or code already used.",
+                description="Invalid input or code already used."
             ),
             404: OpenApiResponse(
-                response=None, description="Invite code not found."
+                response=None,
+                description="Invite code not found."
+            ),
+            401: OpenApiResponse(
+                response=None,
+                description="Authentication credentials were not provided or invalid."
             ),
         },
         examples=[
